@@ -2,11 +2,13 @@ import csv
 import uuid
 import textwrap
 from PIL import Image, ImageDraw, ImageFont
+import warnings
+warnings.filterwarnings("ignore")
 
 
 def insert_gossip_on_template(template_path, csv_path, output_dir):
     # Load the gossip data from the CSV file
-    with open(csv_path, 'r') as file:
+    with open(csv_path, 'r', encoding='utf-8') as file:
         reader = csv.DictReader(file)
         gossip_data = list(reader)
 
@@ -19,10 +21,13 @@ def insert_gossip_on_template(template_path, csv_path, output_dir):
     for data in gossip_data:
         committee = data['Which committee are you?']
         gossip = data['Gossip?']
+        timestamp = data['Timestamp'] 
+
+        if timestamp <= '2023/06/23 2:33:01 pm EEST':
+            continue
 
         template = Image.open(template_path)
         draw = ImageDraw.Draw(template)
-        total_height = len(gossip_data) * (font_size + 10)
 
         # Calculate the starting position for the gossip text to be centered vertically
         # start_y = (template.height - total_height) // 2 + 50
@@ -53,11 +58,12 @@ def insert_gossip_on_template(template_path, csv_path, output_dir):
         # Save the resulting image
         output_path = output_dir + output_filename
         template.save(output_path)
+        print(timestamp)
 
 
 # Example usage
 template_path = 'template.jpg'
-csv_path = 'gossip.csv'
+csv_path = 'Gossip box.csv'
 output_dir = './output/'
 
 insert_gossip_on_template(template_path, csv_path, output_dir)
